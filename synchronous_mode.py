@@ -247,38 +247,36 @@ def main():
 
                 image_depth.convert(carla.ColorConverter.Depth)
 
-                # array = np.frombuffer(image_semseg.raw_data, dtype=np.dtype("uint8"))
-                # array = np.reshape(array, (image_semseg.height, image_semseg.width, 4))
-                # array = array[:, :, ::-1]  
-                # opencv_image = array 
+                array = np.frombuffer(image_semseg.raw_data, dtype=np.dtype("uint8"))
+                array = np.reshape(array, (image_semseg.height, image_semseg.width, 4))
+                array = array[:, :, ::-1]  
+                opencv_image = array[:,:,1:]
 
-                # target_bgr=(142, 1, 1)
+                target_bgr=(0,0,142)
 
-                # # Find matching pixels
-                # matching_pixels = np.all(opencv_image == target_bgr, axis=2)
 
-                # total_pixels = opencv_image.shape[0] * opencv_image.shape[1]
-                # percentage = (matching_pixels / total_pixels) * 100
+                # Find matching pixels
+                matching_pixels = np.count_nonzero(np.all(opencv_image == target_bgr, axis=2))
 
-                # print(percentage)
+                total_pixels = opencv_image.shape[0] * opencv_image.shape[1]
+                percentage = (matching_pixels / total_pixels) * 100
 
-                # if percentage>1:
-                #     #saving images to disk  
-                #     image_semseg.save_to_disk('_out/data_out/sync_data/semseg/%08d.png' % snapshot.frame)
-                #     image_depth.save_to_disk('_out/data_out/sync_data/depth/%08d.png' % snapshot.frame)
-                #     image_rgb.save_to_disk('_out/data_out/sync_data/rgb/%08d.png' % snapshot.frame)
+                print(percentage)
 
-                image_semseg.save_to_disk('_out/data_out/sync_data/semseg/%08d.png' % snapshot.frame)
-                image_depth.save_to_disk('_out/data_out/sync_data/depth/%08d.png' % snapshot.frame)
-                image_rgb.save_to_disk('_out/data_out/sync_data/rgb/%08d.png' % snapshot.frame)
+                if percentage>1:
+                    #saving images to disk  
+                    image_semseg.save_to_disk('_out/data_out/sync_data/semseg/%08d.png' % snapshot.frame)
+                    image_depth.save_to_disk('_out/data_out/sync_data/depth/%08d.png' % snapshot.frame)
+                    image_rgb.save_to_disk('_out/data_out/sync_data/rgb/%08d.png' % snapshot.frame)
+
+                # image_semseg.save_to_disk('_out/data_out/sync_data/semseg/%08d.png' % snapshot.frame)
+                # image_depth.save_to_disk('_out/data_out/sync_data/depth/%08d.png' % snapshot.frame)
+                # image_rgb.save_to_disk('_out/data_out/sync_data/rgb/%08d.png' % snapshot.frame)
 
                 # Draw the display.
                 draw_image(display, image_rgb)
                 draw_image(display, image_semseg, blend=True)
                 draw_image(display, image_depth, blend=True)
-
-                time.sleep(3)
-
                 
 
                 display.blit(
